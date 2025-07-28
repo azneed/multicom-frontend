@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import setAuthToken from '../utils/setAuthToken';  // Import setAuthToken
+import setAuthToken from '../utils/setAuthToken'; // Corrected path based on typical structure
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -13,14 +13,15 @@ const AdminLogin = () => {
     e.preventDefault();
     setError('');
     try {
-      const response = await axios.post('/api/admin/login', { username, password });
-      // Assuming your backend returns a token upon successful login
+      const response = await axios.post('http://localhost:5000/api/admin/login', { username, password });
+          
       const { token } = response.data;
-      localStorage.setItem('adminToken', token);
-      setAuthToken(token);  // Set the admin token for Axios (important)
+      localStorage.setItem('adminToken', token); // Store admin token
+      setAuthToken(token); // Apply the admin token for all subsequent requests
+
       navigate('/admin-dashboard'); // Redirect to admin dashboard
     } catch (error) {
-      setError(error.response?.data?.message || 'Login failed.');
+      setError(error.response?.data?.message || 'Login failed. Please check credentials and try again.');
     }
   };
 
@@ -38,7 +39,7 @@ const AdminLogin = () => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="username"
               type="text"
-              placeholder="Username"
+              placeholder="Admin Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -52,7 +53,7 @@ const AdminLogin = () => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
               id="password"
               type="password"
-              placeholder="Password"
+              placeholder="Admin Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -60,7 +61,7 @@ const AdminLogin = () => {
           </div>
           <div className="flex items-center justify-between">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-              Sign In
+              Sign In as Admin
             </button>
           </div>
         </form>

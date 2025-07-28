@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import setAuthToken from '../utils/setAuthToken';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import setAuthToken from '../utils/setAuthToken'; // Correct import path
+import { useNavigate } from 'react-router-dom';
 
 const MemberLoginModal = ({ onClose }) => {
   const [step, setStep] = useState('requestOtp');
@@ -11,7 +11,7 @@ const MemberLoginModal = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleRequestOtp = async (e) => {
     e.preventDefault();
@@ -71,8 +71,8 @@ const MemberLoginModal = ({ onClose }) => {
       setLoading(false);
 
       setTimeout(() => {
+        navigate(`/user-dashboard/${_id}`);
         onClose();
-        navigate(`/user-dashboard/${_id}`); // Use navigate for redirection
       }, 1500);
 
     } catch (err) {

@@ -2,29 +2,28 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
 import PaymentUploadForm from './PaymentUploadForm';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { useParams } from 'react-router-dom'; // Import useParams
+import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [payments, setPayments] = useState([]);
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
-  const { userId } = useParams(); // Get userId from URL
+  const navigate = useNavigate();
+  const { userId } = useParams();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('jwtToken'); // Get token from local storage
+        const token = localStorage.getItem('jwtToken');
         if (!token) {
-          // If no token, redirect to landing page
           navigate('/');
           return;
         }
 
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-        const userRes = await axios.get(`http://localhost:5000/api/users/profile`); // Change to profile route!
+        const userRes = await axios.get(`http://localhost:5000/api/users/profile`);
         const payRes = await axios.get(`http://localhost:5000/api/payments/user/${userId}`);
 
         setUser(userRes.data);
@@ -33,6 +32,12 @@ const UserDashboard = () => {
       } catch (err) {
         console.error('Error loading user profile:', err.message);
         setError('❌ Failed to load user profile.');
+        if (err.response && err.response.status === 401) {
+          localStorage.removeItem('jwtToken');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('userName');
+          navigate('/');
+        }
       }
     };
 

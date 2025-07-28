@@ -1,15 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react'; // Import useRef and useEffect
 import MemberLoginModal from './MemberLoginModal';
-// Import your JoinSchemeModal if you have one, or plan to create it later
-// import JoinSchemeModal from './JoinSchemeModal';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const LandingPage = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
-  // const [showJoinModal, setShowJoinModal] = useState(false); // For future Join Scheme modal
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  // Secret Key Combination Logic
+  // A + N + E + E + S + A (key codes: 65, 78, 69, 69, 83, 65)
+  useEffect(() => {
+    const secretCode = [65, 78, 69, 69, 83, 65];
+    let codeIndex = 0; // Use a local variable for sequence tracking within the effect
+
+    const handleKeyDown = (event) => {
+        // Only process if no input field is focused (to prevent accidental triggers)
+        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+            return;
+        }
+
+        if (event.keyCode === secretCode[codeIndex]) {
+            codeIndex++;
+            if (codeIndex === secretCode.length) {
+                // Secret code entered successfully
+                navigate('/admin-login');
+                codeIndex = 0; // Reset for next use
+                event.preventDefault(); // Prevent default browser behavior if any
+            }
+        } else {
+            codeIndex = 0; // Reset if wrong key is pressed
+        }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown); // Clean up listener
+    };
+  }, [navigate]); // navigate is a dependency
 
   // Placeholder for your carousel/hero section.
-  // You can replace this with a proper carousel library (e.g., react-slick, swiper)
-  // or a simple sliding image component.
   const HeroSection = () => (
     <div
       className="relative h-96 bg-cover bg-center flex items-center justify-center text-white"
