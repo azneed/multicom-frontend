@@ -7,15 +7,40 @@ import SchemeEditor from './SchemeEditor';
 import UserProfile from './UserProfile';
 import AdminMultiPayment from './AdminMultiPayment';
 import PendingPaymentsAdminPanel from './PendingPaymentsAdminPanel';
-import HistoryPage from './HistoryPage'; // ✅ Import HistoryPage
+import HistoryPage from './HistoryPage';
+
+import AdminMemberEditModal from './AdminMemberEditModal';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [selectedUserId, setSelectedUserId] = useState(null);
 
+  // States for search and edit modals
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(''); // ✅ NEW STATE FOR SEARCH
+
   const openUserProfile = (userId) => {
     setSelectedUserId(userId);
     setActiveTab('profile');
+  };
+
+  const handleEditUser = (user) => {
+    setUserToEdit(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleMemberUpdated = () => {
+    setIsEditModalOpen(false);
+    setUserToEdit(null);
+    // Note: UsersList component fetches its own data on mount.
+    // If you need to force a re-fetch here, UsersList would need a prop
+    // that changes or a ref to a function. For now, rely on its internal fetch.
+  };
+
+  // ✅ NEW FUNCTION: Handle search input changes
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -92,7 +117,23 @@ const AdminDashboard = () => {
       </div>
 
       <div className="bg-white rounded-2xl shadow-lg p-6">
-        {activeTab === 'users' && <UsersList onViewProfile={openUserProfile} />}
+        {activeTab === 'users' && (
+          <>
+            {/* ✅ NEW SEARCH INPUT */}
+            <input
+              type="text"
+              placeholder="Search by card no, name, phone, or place..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="mb-4 p-2 border border-gray-300 rounded-md w-full max-w-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+            <UsersList
+              onViewProfile={openUserProfile}
+              onEditUser={handleEditUser}
+              searchQuery={searchQuery} // ✅ PASS SEARCH QUERY
+            />
+          </>
+        )}
         {activeTab === 'payment' && <AddPaymentForm />}
         {activeTab === 'multi' && <AdminMultiPayment />}
         {activeTab === 'week' && <WeekSummary />}
@@ -100,8 +141,16 @@ const AdminDashboard = () => {
         {activeTab === 'scheme' && <SchemeEditor />}
         {activeTab === 'profile' && <UserProfile userId={selectedUserId} onBack={() => setActiveTab('users')} />}
         {activeTab === 'review' && <PendingPaymentsAdminPanel />}
-        {activeTab === 'history' && <HistoryPage />} {/* ✅ New history tab */}
+        {activeTab === 'history' && <HistoryPage />}
       </div>
+
+      {isEditModalOpen && userToEdit && (
+        <AdminMemberEditModal
+          user={userToEdit}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={handleMemberUpdated}
+        />
+      )}
     </div>
   );
 };

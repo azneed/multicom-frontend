@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import PaymentUploadForm from './PaymentUploadForm';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import UserProfileEditModal from './UserProfileEditModal'; // NEW IMPORT
 
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
@@ -11,42 +12,43 @@ const UserDashboard = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { userId } = useParams();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // NEW STATE
+
+  const fetchProfile = async () => { // Moved fetchProfile out for easier reuse
+    try {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        navigate('/');
+        return;
+      }
+
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      const userRes = await axios.get(`http://localhost:5000/api/users/profile`);
+      const payRes = await axios.get(`http://localhost:5000/api/payments/user/${userId}`);
+
+      setUser(userRes.data);
+      setPayments(payRes.data);
+      setError('');
+    } catch (err) {
+      console.error('Error loading user profile:', err.message);
+      setError('❌ Failed to load user profile.');
+      if (err.response && err.response.status === 401) {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userName');
+        navigate('/');
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem('jwtToken');
-        if (!token) {
-          navigate('/');
-          return;
-        }
-
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-        const userRes = await axios.get(`http://localhost:5000/api/users/profile`);
-        const payRes = await axios.get(`http://localhost:5000/api/payments/user/${userId}`);
-
-        setUser(userRes.data);
-        setPayments(payRes.data);
-        setError('');
-      } catch (err) {
-        console.error('Error loading user profile:', err.message);
-        setError('❌ Failed to load user profile.');
-        if (err.response && err.response.status === 401) {
-          localStorage.removeItem('jwtToken');
-          localStorage.removeItem('userId');
-          localStorage.removeItem('userName');
-          navigate('/');
-        }
-      }
-    };
-
     if (userId) {
       fetchProfile();
     } else {
       setError('❌ User ID not provided in URL. Cannot load profile.');
     }
-  }, [userId, navigate]);
+  }, [userId, navigate]); // Add fetchProfile to dependency array if you pass it as prop, otherwise fine
 
   const paidWeeksMap = {};
   payments.forEach((p) => {
@@ -56,6 +58,11 @@ const UserDashboard = () => {
     }
   });
 
+  const handleProfileUpdated = () => { // Callback after successful update
+    setIsEditModalOpen(false); // Close modal
+    fetchProfile(); // Re-fetch data to show updated info
+  };
+
   return (
     <div className="p-4">
       {error && <p className="text-red-600 mb-4">{error}</p>}
@@ -64,6 +71,12 @@ const UserDashboard = () => {
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-blue-700 mb-2">
             👤 {user.name}'s Profile
+            <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="ml-4 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+            >
+                Edit Profile
+            </button>
           </h2>
           <p><strong>Card Number:</strong> {user.cardNumber}</p>
           <p><strong>Phone:</strong> {user.phone}</p>
@@ -120,6 +133,14 @@ const UserDashboard = () => {
         <div className="mt-8">
           <PaymentUploadForm userId={userId} />
         </div>
+      )}
+
+      {isEditModalOpen && user && (
+        <UserProfileEditModal
+          user={user}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={handleProfileUpdated}
+        />
       )}
     </div>
   );
