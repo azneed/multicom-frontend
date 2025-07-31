@@ -8,8 +8,8 @@ import UserProfile from './UserProfile';
 import AdminMultiPayment from './AdminMultiPayment';
 import PendingPaymentsAdminPanel from './PendingPaymentsAdminPanel';
 import HistoryPage from './HistoryPage';
-
 import AdminMemberEditModal from './AdminMemberEditModal';
+import ReportsAndAnalytics from './ReportsAndAnalytics'; // ✅ NEW IMPORT: ReportsAndAnalytics
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
@@ -18,7 +18,7 @@ const AdminDashboard = () => {
   // States for search and edit modals
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(''); // ✅ NEW STATE FOR SEARCH
+  const [searchQuery, setSearchQuery] = useState('');
 
   const openUserProfile = (userId) => {
     setSelectedUserId(userId);
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
     // that changes or a ref to a function. For now, rely on its internal fetch.
   };
 
-  // ✅ NEW FUNCTION: Handle search input changes
+  // ✅ NEW FUNCTION: Handle search input changes (existing from your code)
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -114,12 +114,21 @@ const AdminDashboard = () => {
         >
           📜 History Log
         </button>
+        {/* ✅ NEW NAVIGATION BUTTON FOR REPORTS */}
+        <button
+          onClick={() => setActiveTab('reports')}
+          className={`px-4 py-2 rounded-xl font-semibold shadow-md transition ${
+            activeTab === 'reports' ? 'bg-blue-600 text-white' : 'bg-white'
+          }`}
+        >
+          📊 Reports & Analytics
+        </button>
       </div>
 
       <div className="bg-white rounded-2xl shadow-lg p-6">
         {activeTab === 'users' && (
           <>
-            {/* ✅ NEW SEARCH INPUT */}
+            {/* Existing Search Input */}
             <input
               type="text"
               placeholder="Search by card no, name, phone, or place..."
@@ -130,7 +139,7 @@ const AdminDashboard = () => {
             <UsersList
               onViewProfile={openUserProfile}
               onEditUser={handleEditUser}
-              searchQuery={searchQuery} // ✅ PASS SEARCH QUERY
+              searchQuery={searchQuery} // Passing search query to UsersList
             />
           </>
         )}
@@ -142,6 +151,8 @@ const AdminDashboard = () => {
         {activeTab === 'profile' && <UserProfile userId={selectedUserId} onBack={() => setActiveTab('users')} />}
         {activeTab === 'review' && <PendingPaymentsAdminPanel />}
         {activeTab === 'history' && <HistoryPage />}
+        {/* ✅ NEW CONDITIONAL RENDERING FOR REPORTS */}
+        {activeTab === 'reports' && <ReportsAndAnalytics />}
       </div>
 
       {isEditModalOpen && userToEdit && (
