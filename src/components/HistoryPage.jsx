@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'; // You are using dayjs, which is good.
 
 const HistoryPage = () => {
   const [logs, setLogs] = useState([]);
@@ -8,7 +8,7 @@ const HistoryPage = () => {
 
   useEffect(() => {
     fetchLogs();
-  }, []);
+  }, [filter]); // ✅ FIX: Added filter to dependency array to re-fetch when filter changes
 
   const fetchLogs = async () => {
     try {
@@ -34,9 +34,9 @@ const HistoryPage = () => {
     if (type === 'approve') return '✅ Approved';
     if (type === 'reject') return '❌ Rejected';
     if (type === 'manual') return '✍️ Manual Entry';
-    if (type === 'user_uploaded_for_review') return '⬆️ User Uploaded'; // Added this actionType
-    if (type === 'register') return '📝 User Registered'; // Added this actionType
-    if (type === 'delete') return '🗑️ Deleted'; // Added this actionType
+    if (type === 'user_uploaded_for_review') return '⬆️ User Uploaded';
+    if (type === 'register') return '📝 User Registered';
+    if (type === 'delete') return '🗑️ Deleted';
     return 'ℹ️';
   };
 
@@ -57,17 +57,26 @@ const HistoryPage = () => {
             <div key={log._id} className="border p-4 rounded-xl shadow-md bg-white">
               <p><strong>👤 Name:</strong> {log.userId?.name} ({log.userId?.cardNumber})</p>
               <p><strong>📞 Phone:</strong> {log.userId?.phone}</p>
-              <p><strong>💸 Amount:</strong> ₹{log.amount}</p>
+              {/* ✅ FIX: Add conditional check for amount before displaying */}
+              {log.amount !== undefined && log.amount !== null && <p><strong>💸 Amount:</strong> ₹{log.amount}</p>}
               <p><strong>📦 Mode:</strong> {log.mode}</p>
               {log.week && <p><strong>📅 Week:</strong> {log.week}</p>}
               <p><strong>🕒 Time:</strong> {dayjs(log.createdAt).format('DD MMM YYYY hh:mm A')}</p>
               <p><strong>🔁 Action:</strong> {displayLabel(log.actionType)}</p>
-              {/* Consistently use log.screenshotUrl */}
+
+              {/* ✅ FIX: Use log.screenshotUrl DIRECTLY from S3 */}
+              {/* ✅ ADDED: onError to provide a fallback if image doesn't load */}
               {log.screenshotUrl && (
                 <img
-                  src={`http://localhost:5000/uploads/${log.screenshotUrl}`}
+                  src={log.screenshotUrl} // Use the full S3 URL directly
                   alt="proof"
                   className="w-full mt-2 rounded"
+                  onError={(e) => {
+                    // Fallback if image fails to load (e.g., if it was deleted from S3)
+                    e.target.onerror = null; // Prevent infinite loop if fallback also fails
+                    e.target.src = 'https://via.placeholder.com/150?text=Image+Not+Found'; // Provide a placeholder
+                    console.error('Failed to load image from S3:', log.screenshotUrl);
+                  }}
                 />
               )}
             </div>

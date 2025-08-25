@@ -1,6 +1,7 @@
+// multicom-frontend/src/components/MemberLoginModal.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import setAuthToken from '../utils/setAuthToken'; // Correct import path
+import setAuthToken from '../utils/setAuthToken';
 import { useNavigate } from 'react-router-dom';
 
 const MemberLoginModal = ({ onClose }) => {
@@ -26,8 +27,9 @@ const MemberLoginModal = ({ onClose }) => {
     }
 
     try {
+      // ✅ FIX: Revert to sending 'cardNumber' and 'phone' as per your original working code
       const res = await axios.post('http://localhost:5000/api/users/generate-otp', {
-        cardNumber,
+        cardNumber: parseInt(cardNumber, 10), // Ensure it's parsed as number for backend
         phone: phoneNumber
       });
 
@@ -54,24 +56,26 @@ const MemberLoginModal = ({ onClose }) => {
     }
 
     try {
+      // ✅ FIX: Revert to sending 'cardNumber' and 'phone' as per your original working code
       const res = await axios.post('http://localhost:5000/api/users/verify-otp', {
-        cardNumber,
+        cardNumber: parseInt(cardNumber, 10), // Ensure it's parsed as number for backend
         phone: phoneNumber,
-        otp
+        submittedOtp: otp
       });
 
-      const { token, _id, name } = res.data;
+      // The backend (authController.js) returns { token, user: { id, name, cardNumber } }
+      const { token, user } = res.data; 
 
       localStorage.setItem('jwtToken', token);
-      localStorage.setItem('userId', _id);
-      localStorage.setItem('userName', name);
+      localStorage.setItem('userId', user.id);
+      localStorage.setItem('userName', user.name);
       setAuthToken(token);
 
       setSuccessMessage('Login successful! Redirecting to dashboard...');
       setLoading(false);
 
       setTimeout(() => {
-        navigate(`/user-dashboard/${_id}`);
+        navigate(`/user-dashboard/${user.id}`);
         onClose();
       }, 1500);
 
@@ -115,7 +119,7 @@ const MemberLoginModal = ({ onClose }) => {
                 id="card-number"
                 value={cardNumber}
                 onChange={(e) => setCardNumber(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 placeholder="Enter your card number"
                 required
               />
@@ -129,7 +133,7 @@ const MemberLoginModal = ({ onClose }) => {
                 id="phone-number"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 placeholder="e.g., 9876543210"
                 required
               />
@@ -153,8 +157,7 @@ const MemberLoginModal = ({ onClose }) => {
                 id="otp"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-center text-xl tracking-widest"
-                placeholder="_ _ _ _ _ _"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-center text-xl tracking-widest text-gray-900"
                 maxLength="6"
                 required
               />

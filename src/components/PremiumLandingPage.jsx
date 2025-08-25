@@ -1,70 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 import { Helmet } from "react-helmet";
-import { useNavigate } from "react-router-dom";
-import MemberLoginModal from './MemberLoginModal';
 
-// Define brochureSlides ONCE at the top (remove any other declarations)
-const brochureSlides = [
-  { image: "/images/scheme-page1.jpg", alt: "Scheme Page 1" },
-  { image: "/images/scheme-page2.jpg", alt: "Scheme Page 2" },
-  { image: "/images/scheme-page3.jpg", alt: "Scheme Page 3" },
-  { image: "/images/scheme-page4.jpg", alt: "Scheme Page 4" },
-];
 
-export default function LandingPage() {
+<Helmet>
+  <title>My Page Title</title>
+</Helmet>
+
+
+
+export default function PremiumLandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPrize, setSelectedPrize] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const navigate = useNavigate();
-
-  // Secret Key Combination Logic
-  useEffect(() => {
-    const secretCode = [65, 78, 69, 69, 83, 65];
-    let codeIndex = 0;
-    const handleKeyDown = (event) => {
-      if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
-        return;
-      }
-      if (event.keyCode === secretCode[codeIndex]) {
-        codeIndex++;
-        if (codeIndex === secretCode.length) {
-          navigate('/admin-login');
-          codeIndex = 0;
-          event.preventDefault();
-        }
-      } else {
-        codeIndex = 0;
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate]);
-
-  // Carousel effect with fixed dependency
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % brochureSlides.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [brochureSlides.length]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const openPrizeModal = (prize) => {
-    setSelectedPrize(prize);
-    setIsModalOpen(true);
-  };
+  const carouselRef = useRef(null);
 
   // Prize categories
   const prizes = {
@@ -110,12 +63,45 @@ export default function LandingPage() {
     ]
   };
 
+  // Scheme brochure slides
+  const brochureSlides = [
+    { image: "/images/scheme-page1.jpg", alt: "Scheme Page 1" },
+    { image: "/images/scheme-page2.jpg", alt: "Scheme Page 2" },
+    { image: "/images/scheme-page3.jpg", alt: "Scheme Page 3" },
+    { image: "/images/scheme-page4.jpg", alt: "Scheme Page 4" },
+  ];
+
+  // Auto-advance carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % brochureSlides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Scroll effect for header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Open prize modal
+  const openPrizeModal = (prize) => {
+    setSelectedPrize(prize);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
-      <Helmet>
-        <title>MULTICom Gift Scheme - Win Amazing Prizes</title>
-        <meta name="description" content="Join Uppala's most trusted gift scheme for 16 seasons! Win 1BHK Flat, Maruti Suzuki Fronx, and more exciting prizes." />
-      </Helmet>
+ 
+<Helmet>
+    <title>MULTICom Gift Scheme - Win Amazing Prizes</title>
+    <meta name="description" content="Join Uppala's most trusted gift scheme for 16 seasons! Win 1BHK Flat, Maruti Suzuki Fronx, and more exciting prizes." />
+  </Helmet>
+
 
       {/* Animated Background */}
       <div className="fixed inset-0 z-0 opacity-20">
@@ -149,7 +135,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? "bg-gray-900/90 backdrop-blur-md py-2 shadow-lg" : "bg-transparent py-4"}`}>
         <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center">
             {/* Logo */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
@@ -157,9 +143,9 @@ export default function LandingPage() {
               transition={{ duration: 0.5 }}
               className="flex items-center space-x-3"
             >
-              <img src="/images/logo.png" alt="MULTICom Logo" className="h-32" />
+              <img src="/images/logo.png" alt="MULTICom Logo" className="h-12" />
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"></h1>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">MULTICom</h1>
                 <p className="text-xs text-gray-400">Season 16 • 2025-26</p>
               </div>
             </motion.div>
@@ -176,8 +162,9 @@ export default function LandingPage() {
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 transition-all duration-300 group-hover:w-full"></span>
                 </a>
               ))}
-            </nav>     
-            {/* Mobile Menu Button - THIS IS THE START OF THE PROBLEM AREA */}
+            </nav>
+
+            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors"
@@ -188,9 +175,9 @@ export default function LandingPage() {
                 <div className={`w-full h-0.5 bg-white transition-all ${isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""}`}></div>
               </div>
             </button>
-          </div> {/* <--- THIS IS LIKELY THE LINE 198 (OR NEARBY) THAT CLOSES THE FLEX CONTAINER */}
+          </div>
 
-          {/* Mobile Menu - THIS IS THE ADJACENT ELEMENT */}
+          {/* Mobile Menu */}
           {isMenuOpen && (
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
@@ -297,7 +284,7 @@ export default function LandingPage() {
             >
               {[
                 { value: "60", label: "Weeks", color: "from-purple-400 to-blue-400" },
-                { value: "₹100", label: "Weekly", color: "from-yellow-400 to-orange-400" },
+                { value: "₹500", label: "Weekly", color: "from-yellow-400 to-orange-400" },
                 { value: "100+", label: "Prizes", color: "from-green-400 to-blue-400" },
                 { value: "16", label: "Seasons", color: "from-pink-400 to-purple-400" }
               ].map((stat, index) => (
@@ -392,70 +379,72 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* 1BHK Flat */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="group relative overflow-hidden rounded-2xl hover:scale-[1.02] transition-all duration-500 cursor-pointer h-64 md:h-80"
-              onClick={() => openPrizeModal(prizes.grand[0])}
-            >
-              {/* Background Image */}
-              <div className="absolute inset-0 bg-gray-800">
-                <img
-                  src="/images/flat.webp"
-                  alt="1BHK Flat"
-                  className="w-full h-full object-cover opacity-70 group-hover:opacity-80 transition-opacity duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black/90"></div>
-              </div>
-              
-              {/* Content */}
-              <div className="relative z-10 h-full flex flex-col justify-end p-6">
-                <div className="text-4xl mb-2"></div>
-                <h3 className="text-2xl font-bold mb-2 text-white">
-                  1BHK FLAT
-                </h3>
-                <p className="text-gray-300 mb-4">Luxury apartment in prime location</p>
-                <div className="bg-purple-600/30 backdrop-blur-sm border border-purple-500/20 rounded-lg p-3 inline-block">
-                  <div className="font-bold text-yellow-300">Week 60 Draw</div>
-                  <div className="text-xs text-purple-200">Grand Finale Prize</div>
-                </div>
-              </div>
-            </motion.div>
+            {/* 1BHK Flat Prize Card - Updated Version */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5, delay: 0.2 }}
+  viewport={{ once: true }}
+  className="group relative overflow-hidden rounded-2xl hover:scale-[1.02] transition-all duration-500 cursor-pointer h-64 md:h-80"
+  onClick={() => openPrizeModal(prizes.grand[0])}
+>
+  {/* Background Image */}
+  <div className="absolute inset-0 bg-gray-800">
+    <img
+      src="/images/flat.webp"
+      alt="1BHK Flat"
+      className="w-full h-full object-cover opacity-70 group-hover:opacity-80 transition-opacity duration-500"
+    />
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black/90"></div>
+  </div>
+  
+  {/* Content */}
+  <div className="relative z-10 h-full flex flex-col justify-end p-6">
+    <div className="text-4xl mb-2"></div>
+    <h3 className="text-2xl font-bold mb-2 text-white">
+      1BHK FLAT
+    </h3>
+    <p className="text-gray-300 mb-4">Luxury apartment in prime location</p>
+    <div className="bg-purple-600/30 backdrop-blur-sm border border-purple-500/20 rounded-lg p-3 inline-block">
+      <div className="font-bold text-yellow-300">Week 60 Draw</div>
+      <div className="text-xs text-purple-200">Grand Finale Prize</div>
+    </div>
+  </div>
+</motion.div>
 
             {/* Maruti Suzuki Fronx */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              viewport={{ once: true }}
-              className="group relative overflow-hidden rounded-2xl hover:scale-[1.02] transition-all duration-500 cursor-pointer h-64 md:h-80"
-              onClick={() => openPrizeModal(prizes.grand[1])}
-            >
-              {/* Background Image */}
-              <div className="absolute inset-0 bg-gray-800">
-                <img
-                  src="/images/fronx.webp"
-                  alt="Maruti Suzuki Fronx"
-                  className="w-full h-full object-cover opacity-70 group-hover:opacity-80 transition-opacity duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black/90"></div>
-              </div>
-              
-              {/* Content */}
-              <div className="relative z-10 h-full flex flex-col justify-end p-6">
-                <div className="text-4xl mb-2"></div>
-                <h3 className="text-2xl font-bold mb-2 text-white">
-                  MARUTI SUZUKI FRONX
-                </h3>
-                <p className="text-gray-300 mb-4">Brand new car with premium features</p>
-                <div className="bg-blue-600/30 backdrop-blur-sm border border-blue-500/20 rounded-lg p-3 inline-block">
-                  <div className="font-bold text-yellow-300">Week 60 Draw</div>
-                  <div className="text-xs text-blue-200">Grand Finale Prize</div>
-                </div>
-              </div>
-            </motion.div>
+            {/* Maruti Suzuki Fronx Prize Card */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5, delay: 0.4 }}
+  viewport={{ once: true }}
+  className="group relative overflow-hidden rounded-2xl hover:scale-[1.02] transition-all duration-500 cursor-pointer h-64 md:h-80"
+  onClick={() => openPrizeModal(prizes.grand[1])}
+>
+  {/* Background Image */}
+  <div className="absolute inset-0 bg-gray-800">
+    <img
+      src="/images/fronx.webp"
+      alt="Maruti Suzuki Fronx"
+      className="w-full h-full object-cover opacity-70 group-hover:opacity-80 transition-opacity duration-500"
+    />
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black/90"></div>
+  </div>
+  
+  {/* Content */}
+  <div className="relative z-10 h-full flex flex-col justify-end p-6">
+    <div className="text-4xl mb-2"></div>
+    <h3 className="text-2xl font-bold mb-2 text-white">
+      MARUTI SUZUKI FRONX
+    </h3>
+    <p className="text-gray-300 mb-4">Brand new car with premium features</p>
+    <div className="bg-blue-600/30 backdrop-blur-sm border border-blue-500/20 rounded-lg p-3 inline-block">
+      <div className="font-bold text-yellow-300">Week 60 Draw</div>
+      <div className="text-xs text-blue-200">Grand Finale Prize</div>
+    </div>
+  </div>
+</motion.div>
           </div>
         </div>
       </section>
@@ -558,8 +547,8 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             {[
-              { step: "01", icon: "📝", title: "Register", desc: "Visit our Uppala office with ₹100", color: "from-green-400 to-blue-400" },
-              { step: "02", icon: "💰", title: "Pay Weekly", desc: "₹100 every week for 60 weeks", color: "from-blue-400 to-purple-400" },
+              { step: "01", icon: "📝", title: "Register", desc: "Visit our Uppala office with ₹500", color: "from-green-400 to-blue-400" },
+              { step: "02", icon: "💰", title: "Pay Weekly", desc: "₹500 every week for 60 weeks", color: "from-blue-400 to-purple-400" },
               { step: "03", icon: "🎰", title: "Weekly Draws", desc: "Every Thursday at 4:30 PM", color: "from-purple-400 to-pink-400" },
               { step: "04", icon: "🏆", title: "Win Prizes", desc: "Amazing rewards every week!", color: "from-pink-400 to-yellow-400" }
             ].map((item, index) => (
@@ -613,7 +602,7 @@ export default function LandingPage() {
               </h2>
               
               <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Join thousands of winners in Season 16! With just ₹100 per week, you could be our next grand prize winner.
+                Join thousands of winners in Season 16! With just ₹500 per week, you could be our next grand prize winner.
               </p>
 
               <div className="flex flex-wrap gap-6 justify-center">
@@ -841,7 +830,7 @@ export default function LandingPage() {
                 <li><span className="text-gray-400">Season 2025-26</span></li>
                 <li><span className="text-gray-400">60 Week Scheme</span></li>
                 <li><span className="text-gray-400">Draw: Thursday 4:30 PM</span></li>
-                <li><span className="text-gray-400">Weekly: ₹100</span></li>
+                <li><span className="text-gray-400">Weekly: ₹500</span></li>
               </ul>
             </div>
 
@@ -947,23 +936,6 @@ export default function LandingPage() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Member Login Button - Floating */}
-      <motion.button
-        onClick={() => setShowLoginModal(true)}
-        className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg transition-all duration-300 hover:scale-105 flex items-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.5 }}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-        </svg>
-        Member Login
-      </motion.button>
-
-      {/* Member Login Modal */}
-      {showLoginModal && <MemberLoginModal onClose={() => setShowLoginModal(false)} />}
     </div>
   );
 }

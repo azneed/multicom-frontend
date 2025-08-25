@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" role="img" aria-label="MULTI Com Logo">
+  <!-- Blue ellipse with yellow border -->
+  <ellipse cx="200" cy="100" rx="150" ry="70" fill="#0057B7" stroke="#FFD700" stroke-width="4" />
+
+  <!-- MULTI text -->
+  <text x="200" y="110" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
+    MULTI
+  </text>
+
+  <!-- Com text -->
+  <text x="360" y="110" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#FFD700">
+    Com
+  </text>
+
+  <!-- Tagline -->
+  <text x="200" y="150" font-family="Brush Script MT, cursive" font-size="20" fill="#FFFFFF" text-anchor="middle">
+    The 6th Generation Needs..
+  </text>
+
+  <!-- Presents line -->
+  <text x="200" y="175" font-family="Brush Script MT, cursive" font-size="18" fill="#FFFFFF" text-anchor="middle">
+    UPPALA Presents
+  </text>
+</svg>
